@@ -7,18 +7,12 @@ import { createInvoice, getInvoices } from "./services/factusService.js";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-// Allow multiple origins
-const allowedOrigins = ['https://facturacion-frontend-five.vercel.app/']
-
-app.use(cors({origin: allowedOrigins, credentials: true}));
-
 app.get("/", (req, res) => {
-  res.send("API Factus funcionando");
+  res.send("API Factus funcionando 🚀");
 });
 
 app.post("/crear-factura", async (req, res) => {
@@ -73,6 +67,6 @@ app.get("/facturas", async (req, res) => {
 
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`)
+app.listen(3000, () => {
+  console.log("Servidor corriendo en puerto 3000");
 });
