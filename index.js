@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // Allow multiple origins
-const allowedOrigins = ['http://localhost:5173', 'https://facturacion-frontend-five.vercel.app/']
+const allowedOrigins = ['https://facturacion-frontend-five.vercel.app/']
 
 app.use(cors({origin: allowedOrigins, credentials: true}));
 
