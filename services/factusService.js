@@ -5,7 +5,7 @@ dotenv.config();
 
 const API = process.env.BASE_URL;
 
-const getToken = async () => {
+export const getToken = async () => {
 
   const response = await axios.post(`${API}/oauth/token`, {
     grant_type: "password",
@@ -73,8 +73,8 @@ export const createInvoice = async (data) => {
       }
     }
   );
-
-  return response.data;
+  
+  return response;
 
 };
 
@@ -93,4 +93,21 @@ export const getInvoices = async () => {
 
   return response.data;
 
+};
+
+export const downloadInvoicePDF = async (billNumber) => {
+  const token = await getToken();
+
+  const response = await axios.get(
+    `${API}/v1/bills/download-pdf/${billNumber}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    }
+  );
+
+  // Factus devuelve el PDF codificado en base64 dentro de un JSON
+  return response.data; // { data: { pdf_base_64_encoded: "..." } }
 };

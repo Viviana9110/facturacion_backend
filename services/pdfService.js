@@ -1,28 +1,58 @@
 import PDFDocument from "pdfkit";
-import fs from "fs";
 
+/*
+ =============================================
+   GENERAR PDF EN BASE64
+ =============================================
+*/
 export const generateInvoicePDF = (bill) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({
+        size: "A4",
+        margin: 40,
+      });
 
-  const filePath = `./factura-${bill.number}.pdf`;
+      let buffers = [];
 
-  const doc = new PDFDocument();
+      doc.on("data", (chunk) => buffers.push(chunk));
 
-  doc.pipe(fs.createWriteStream(filePath));
+      doc.on("end", () => {
+        const pdfBuffer = Buffer.concat(buffers);
+        const base64 = `data:application/pdf;base64,${pdfBuffer.toString("base64")}`;
+        resolve(base64);
+      });
 
-  doc.fontSize(20).text("FACTURA ELECTRÓNICA", { align: "center" });
+      /* ========== ENCABEZADO ========== */
+      doc
+        .fontSize(22)
+        .fillColor("#000000")
+        .text("FACTURA ELECTRÓNICA", { align: "center" });
 
-  doc.moveDown();
+      doc.moveDown(1.5);
 
-  doc.fontSize(12).text(`Número de factura: ${bill.number}`);
-  doc.text(`CUFE: ${bill.cufe}`);
-  doc.text(`Total: $${bill.total}`);
+      /* ========== DATOS DE FACTURA ========== */
+      doc.fontSize(12).text(`Número de factura: ${bill.number}`);
+      doc.text(`CUFE: ${bill.cufe}`);
+      doc.text(`Total: $${Number(bill.total).toLocaleString()}`);
 
-  doc.moveDown();
+      doc.moveDown();
 
-  doc.text("Validación DIAN:");
-  doc.text(bill.qr);
+      /* ========== QR O LINK DE VALIDACIÓN ========== */
+      doc.fontSize(12).text("Validación DIAN:", { underline: true });
 
-  doc.end();
+      if (bill.qr?.startsWith("http")) {
+        // Caso QR como URL (la mayoría de veces)
+        doc.fillColor("blue").text(bill.qr, { link: bill.qr });
+      } else {
+        // Caso QR base64 directo (poco común)
+        doc.fillColor("#000").text(bill.qr);
+      }
 
-  return filePath;
+      doc.end();
+
+    } catch (err) {
+      reject(err);
+    }
+  });
 };
