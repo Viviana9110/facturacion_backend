@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import axios from "axios";
 
-import { createInvoice, getInvoices, getToken } from "./services/factusService.js";
+import { createInvoice, getInvoiceByNumber, getInvoices, getToken } from "./services/factusService.js";
 
 dotenv.config();
 
@@ -76,9 +76,17 @@ app.get("/factura-pdf/:number", async (req, res) => {
       }
     );
 
-    const bill = response.data.data.bill;
+    console.log("FACTURA:", response.data);
 
-    if (!bill || !bill.pdf) {
+    const bill = response.data?.data?.bill;
+
+    if (!bill) {
+      return res.status(404).json({
+        error: "Factura no encontrada",
+      });
+    }
+
+    if (!bill.pdf) {
       return res.status(404).json({
         error: "Factura aún no tiene PDF",
       });
@@ -101,6 +109,8 @@ app.get("/factura-pdf/:number", async (req, res) => {
     });
   }
 });
+
+app.get("/invoice/:number", getInvoiceByNumber)
 
 
 

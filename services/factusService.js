@@ -111,3 +111,43 @@ export const downloadInvoicePDF = async (billNumber) => {
   // Factus devuelve el PDF codificado en base64 dentro de un JSON
   return response.data; // { data: { pdf_base_64_encoded: "..." } }
 };
+
+export const getInvoiceByNumber = async (req, res) => {
+  const { number } = req.params;
+
+  try {
+    const token = await getToken();
+
+    const response = await axios.get(
+      `${API}/v1/bills/show/${number}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const bill = response.data?.data?.bill;
+
+    if (!bill) {
+      return res.status(404).json({
+        error: "Factura no encontrada",
+      });
+    }
+
+    res.json({
+      ok: true,
+      data: {
+        bill,
+        customer: response.data?.data?.customer,
+      },
+    });
+
+  } catch (error) {
+    console.error("❌ ERROR OBTENIENDO FACTURA:", error.response?.data || error.message);
+
+    res.status(500).json({
+      error: "Error obteniendo factura",
+    });
+  }
+};
