@@ -14,7 +14,7 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://green-cart-eight-sigma.vercel.app"
+  "https://facturacion-frontend-five.vercel.app/"
 ];
 
 app.use(
